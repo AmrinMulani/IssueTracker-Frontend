@@ -61,7 +61,10 @@ export function provideConfig() {
       { path: '*', component: LoginComponent },
       { path: 'myview', component: MyviewComponent, canActivate: [IssueguardGuard] },
       { path: 'viewall', component: ViewallComponent, canActivate: [IssueguardGuard] },
-      { path: 'notfound', component: NotfoundComponent, canActivate: [IssueguardGuard] }
+      { path: 'notfound', component: NotfoundComponent, canActivate: [IssueguardGuard] },
+      { path: '**', component: NotfoundComponent, canActivate: [IssueguardGuard] }
+
+
 
     ]),
   ],
