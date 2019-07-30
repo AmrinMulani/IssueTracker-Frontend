@@ -42,7 +42,7 @@ export class AppService {
       .set("email", data.email)
       .set("mobileNumber", data.mobileNumber)
 
-
+    console.log(this.baseUrl);
     let response = this.http.post(`${this.baseUrl}/users/signup`, params);
     return response;
   }

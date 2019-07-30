@@ -38,7 +38,7 @@ export class EditIssueComponent implements OnInit {
   currentUserId: string
   watchee: boolean = false
   watcherArray: any[]
-  allStatus = ["inProgress", "Backlog", "Pending", "Resolved"]
+  allStatus = ["inProgress", "backLog", "inTest", "done"]
 
   constructor(private _service: AppService, private _route: Router, private _issueService: IssueService,
     private toastr: ToastrService, private actRouter: ActivatedRoute) { }
