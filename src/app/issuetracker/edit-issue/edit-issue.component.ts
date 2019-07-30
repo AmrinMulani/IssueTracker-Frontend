@@ -5,6 +5,7 @@ import { ToastrService } from 'ngx-toastr';
 import { IssueService } from './../../issue.service';
 import { Cookie } from 'ng2-cookies/ng2-cookies';
 import { SocketService } from 'src/app/socket.service';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-edit-issue',
@@ -40,13 +41,14 @@ export class EditIssueComponent implements OnInit {
   watchee: boolean = false
   watcherArray: any[]
   allStatus = ["inProgress", "backLog", "inTest", "done"]
-
+  baseUrl: string;
   constructor(private _service: AppService, private _route: Router, private _issueService: IssueService, private socketService: SocketService,
-    private toastr: ToastrService, private actRouter: ActivatedRoute) { }
+    private toastr: ToastrService, private actRouter: ActivatedRoute) {
+    this.baseUrl = environment.socketURL;
+  }
 
   ngOnInit() {
     this.issueId = this.actRouter.snapshot.paramMap.get('issueId');
-
     const localStg = JSON.parse(localStorage.getItem('userInfo'));
     this.currentUserId = localStg.userDetails.userId;
     //this.userInfo = this._service.getUserInfoFromLocalStorage()
@@ -86,7 +88,7 @@ export class EditIssueComponent implements OnInit {
             this.status = resp.data.status;
             this.reporter = resp.data.reporter
             this.reporterId = resp.data.reporterId
-            this.imageUrl = resp.data.attachment ? "http://localhost:3000/" + resp.data.attachment : null;
+            this.imageUrl = resp.data.attachment ? this.baseUrl + "/" + resp.data.attachment : null;
 
           } else {
             this.toastr.info('No issue Found')
