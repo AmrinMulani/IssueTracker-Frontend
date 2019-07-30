@@ -1,4 +1,5 @@
 export const environment = {
   production: true,
-  baseUrl: 'api.amiraissuetracker.ga/api/v1'
+  baseUrl: 'http://api.amiraissuetracker.ga/api/v1',
+  socketURL: 'http://api.amiraissuetracker.ga'
 };

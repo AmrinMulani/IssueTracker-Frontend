@@ -3,6 +3,7 @@ import { AppService } from "../../app.service";
 import { IssueService } from "../../issue.service";
 import { Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
+import { SocketService } from 'src/app/socket.service';
 
 
 @Component({
@@ -12,7 +13,7 @@ import { ToastrService } from 'ngx-toastr';
 })
 export class CreateissueComponent implements OnInit {
 
-  constructor(private _service: AppService, private _route: Router, private _issueService: IssueService,
+  constructor(private _service: AppService, private _route: Router, private _issueService: IssueService, private socketService: SocketService,
     private toastr: ToastrService) { }
   authToken: string
   assigneearray: any[]
@@ -83,7 +84,30 @@ export class CreateissueComponent implements OnInit {
           if (apiResponse.status === 200) {
 
             this.toastr.success('issue created successfully', 'Success');
-            this._route.navigate(["/dashboard"]);
+
+            const obj = {
+              assigneeId: this.assigneeId,
+              reporterId: this.reporterId,
+              notifyDescription: `'${this.reporterName}' assigned you a issue- '${this.issueTitle}'`,
+              issueId: apiResponse.data.issueId,
+              watchersId: [],
+              authToken: this.authToken
+            }
+            console.log("\n\n\obj")
+            console.log(obj)
+            this._issueService.addANotify(obj).subscribe(
+              apiResponse => {
+                if (apiResponse.status === 200) {
+
+                  this.socketService.createIssue(obj);
+
+                  this._route.navigate(["/dashboard"]);
+
+                } else {
+                  this.toastr.error(apiResponse.message)
+                }
+              }
+            );
 
           } else {
             this.toastr.error(apiResponse.message, 'Error')

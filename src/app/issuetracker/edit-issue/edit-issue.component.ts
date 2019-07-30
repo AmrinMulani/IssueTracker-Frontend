@@ -4,6 +4,7 @@ import { AppService } from './../../app.service';
 import { ToastrService } from 'ngx-toastr';
 import { IssueService } from './../../issue.service';
 import { Cookie } from 'ng2-cookies/ng2-cookies';
+import { SocketService } from 'src/app/socket.service';
 
 @Component({
   selector: 'app-edit-issue',
@@ -40,7 +41,7 @@ export class EditIssueComponent implements OnInit {
   watcherArray: any[]
   allStatus = ["inProgress", "backLog", "inTest", "done"]
 
-  constructor(private _service: AppService, private _route: Router, private _issueService: IssueService,
+  constructor(private _service: AppService, private _route: Router, private _issueService: IssueService, private socketService: SocketService,
     private toastr: ToastrService, private actRouter: ActivatedRoute) { }
 
   ngOnInit() {
@@ -132,7 +133,7 @@ export class EditIssueComponent implements OnInit {
           this.comment = ""
 
           this.commentList.push(obj);
-          this.addNotification();
+          this.addNotification(`${this.currentUserName} commented on issue '${this.issueTitle}`);
           this.toastr.success('Comment post successfully', 'Success');
         } else {
           console.log(apiResponse.message)
@@ -218,7 +219,7 @@ export class EditIssueComponent implements OnInit {
       )
   }
 
-  public addNotification() {
+  public addNotification(type?: string) {
     let watcherIdlist = []
     if (this.watcherArray != null) {
       for (let x of this.watcherArray) {
@@ -229,11 +230,11 @@ export class EditIssueComponent implements OnInit {
     const obj = {
       assigneeId: this.assigneeId,
       reporterId: this.reporterId,
-      notifyDescription: `'${this.issueTitle}' modified by '${this.currentUserName}'`,
+      notifyDescription: type || `'${this.issueTitle}' modified by '${this.currentUserName}'`,
       issueId: this.issueId,
       watchersId: watcherIdlist,
-      authToken: this.authToken
-
+      authToken: this.authToken,
+      currentUserId: this.currentUserId
     }
 
     console.log("\n\n\obj")
@@ -241,8 +242,7 @@ export class EditIssueComponent implements OnInit {
     this._issueService.addANotify(obj).subscribe(
       apiResponse => {
         if (apiResponse.status === 200) {
-
-
+          this.socketService.updateIssueEmit(obj);
         } else {
           console.log(apiResponse.message)
         }
